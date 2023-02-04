@@ -1,0 +1,17 @@
+<!-- camera.html -->
+
+<!DOCTYPE html>
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}"/>
+<html>
+<head>
+</head>
+<body>
+  <div class = "header">
+  <h1 id="h1"> Take a picture of yourself</h1>
+  <form action="{{ url_for('upload_photo') }}" method="post" enctype="multipart/form-data">
+    <input type="file" id="user" name="photo">
+    <input type="submit" value="Upload">
+  </form>
+  </div>
+</body>
+</html>
