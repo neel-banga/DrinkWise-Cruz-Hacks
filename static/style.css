@@ -1,0 +1,27 @@
+/* style.css */
+
+body{
+ background-color:#F0F0F0;
+}
+
+@font-face{
+  font-family:'test';
+  src:url("Unbounded-Black.ttf");
+}
+
+#h1{
+  color:#2F2F2F;
+  font-family:'test';
+}
+
+.button {
+  border-radius: 6px;
+  border:none;
+  position:absolute;
+  top: 50%;
+  right: 10%;
+  transform:translate(-50%,-10%);
+  font-family:'test';
+  padding:10px;
+  text-align:center;
+}
