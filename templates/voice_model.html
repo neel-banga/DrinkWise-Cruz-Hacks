@@ -6,8 +6,8 @@
 </head>
 <body>
     <button class="bttn1" onclick="document.getElementById('user').click();">Take Video</button>
-    <form action="{{ url_for('upload_photo') }}" method="post" enctype="multipart/form-data">
-    <input type="file" id="user" name="photo" class="file-input">
+    <form action="{{ url_for('upload_video') }}" method="post" enctype="multipart/form-data">
+    <input type="file" id="user" name="video" class="file-input">
     <label for="user" class="button">Choose File</label>
     <input type="submit" value="Upload">
 </form>
