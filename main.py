@@ -19,7 +19,6 @@ def upload_photo():
   val = face_model.check_intoxicated(photo.filename)
   with open('val.txt', 'w') as f:
     f.write(str(val))
-  print(val)
 
   return render_template('voice_model.html')
 
@@ -28,26 +27,25 @@ def upload_video():
   video = request.files['video']
   video.save(video.filename)
 
-  phrase = voice_model.get_phrase(2)
-  print(phrase)
+  phrase = 'energetic happiness'
 
   with open('phrase.txt', 'w') as f:
     f.write(phrase)
 
   voice_model.get_wav_file(video.filename)
 
-  val25, val2 = voice_model.check_slurring('test.wav', phrase)
-  print(val2)
+  val2 = voice_model.check_slurring('test.wav', phrase)
 
   r = open('val.txt', 'r')
   val = r.read()
-  val = int(val)
+  val = float(val)
+  res = val+val2
 
-  print(val+val2)
+  print(res/2)
 
-  if ((val + val2)/2) >= 0.6:
-    return render_template('not_intoxicated.html')
-  else:
+  if res/2 >= 0.6:
     return render_template('intoxicated.html')
+  else:
+    return render_template('not_intoxicated.html')
 
 app.run(host='0.0.0.0', port=18)
