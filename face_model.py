@@ -19,34 +19,35 @@ class Net(nn.Module):
         self.relu = nn.ReLU()
         self.fc2 = nn.Linear(hidden_size, hidden_size)
         self.fc3 = nn.Linear(hidden_size, hidden_size)
+        self.fc4 = nn.Linear(hidden_size, hidden_size)
+        self.fc5 = nn.Linear(hidden_size, hidden_size)
         self.output = nn.Linear(hidden_size, output_size) 
+        self.softmax = nn.Softmax()
 
     def forward(self, x):
         x = self.input(x)
         x = self.relu(x)
         x = self.fc2(x)
+        x = self.relu(x)
         x = self.output(x)
-
+        
         return torch.sigmoid(x)
 
 random.shuffle(set_x)
 random.shuffle(set_y)
 
 input_size = 451632
-hidden_size = 64
+hidden_size =  64
 output_size = 2
 
 EPOCHS = 5
 
 def train_model():
     model = Net(input_size, hidden_size, output_size)
-    #loss_fn = nn.MSELoss()
-    optim = torch.optim.Adam(model.parameters(), 0.00000001)
+    optim = torch.optim.Adam(model.parameters(), lr=0.0001)
+    loss_fn = nn.MSELoss()
 
     model = Net(input_size, hidden_size, output_size)
-
-    loss_fn = nn.BCELoss()
-    #optim = torch.optim.Adam(model.parameters(), lr=0.0001)
 
     for epoch in range(EPOCHS):
 
@@ -66,11 +67,6 @@ def train_model():
 
 #train_model()
 
-intox = Net(input_size, hidden_size, output_size)
-intox.load_state_dict(torch.load('model.pth'))
-intox.eval()
-
-
 def to_tensor(file_path):
     transform = transforms.ToTensor()
     img = Image.open(os.path.join(os.getcwd(), file_path))
@@ -84,9 +80,14 @@ def to_tensor(file_path):
     return padded_tensor
 
 def check_intoxicated(file_path):
-    output = intox(to_tensor(file_path))
-    output = output.tolist()
-
+    intox = Net(input_size, hidden_size, output_size)
+    intox.load_state_dict(torch.load('model.pth'))
+    intox.eval()
+    with torch.no_grad():
+        output = intox(to_tensor(file_path))
+    
+        output = output.tolist()
+        
     print(output)
 
     if output[0]>output[1]:
@@ -94,9 +95,21 @@ def check_intoxicated(file_path):
     else:
         return 1
 
-res = check_intoxicated('normal.jpg')
+y = 0
+correct = 0
+incorrect = 0
+for filename in os.listdir(os.path.join(os.getcwd(), 'pieces')):
+    res = check_intoxicated(os.path.join('pieces', filename))
+    
+    if y == 0:
+        y += 1
+    else:
+        y -= 1
 
-if res == 0:
-    print('NOT INTOXICATED')
-else:
-    print('INTOXICATED')
+    if res == y:
+        correct += 1
+    else:
+        incorrect += 1
+
+total = correct + incorrect
+print(correct/incorrect)
