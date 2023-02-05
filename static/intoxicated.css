@@ -1,1 +1,27 @@
+body{
+    background-color:#D00000;
+}
 
+.header{
+    text-align: center;
+    top:50%;
+    color:black;
+    font-size:100px;
+}
+
+.head{
+  text-align:center;
+  top:30%;
+  color:black;
+  font-size:75px;
+} 
+
+[type="submit"]{
+  font-size:80px;
+  border-radius: 10px;
+  background-color:black;
+  color: white;
+  transform: translate(90%, 50%);
+  border:none;
+  padding: 50px 100px;
+}
