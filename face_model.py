@@ -88,13 +88,9 @@ def check_intoxicated(file_path):
     
         output = output.tolist()
         
-    print(output)
+    return 1-output[0]
 
-    if output[0]>output[1]:
-        return 0
-    else:
-        return 1
-
+'''
 y = 0
 correct = 0
 incorrect = 0
@@ -113,3 +109,4 @@ for filename in os.listdir(os.path.join(os.getcwd(), 'pieces')):
 
 total = correct + incorrect
 print(correct/incorrect)
+'''
