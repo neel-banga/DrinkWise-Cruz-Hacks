@@ -1,11 +1,12 @@
 import requests
 import random
 import speech_recognition as sr
+from pydub import AudioSegment
 
 # Check if someones voice is slurring
 
 # Get phrase to say
-def get_phrase():
+def get_phrase(num):
     words = 'https://www.mit.edu/~ecprice/wordlist.10000'
     response = requests.get(words)
 
@@ -18,12 +19,14 @@ def get_phrase():
 
     phrase = ''
 
-    for i in range(5):
+    for i in range(num):
 
         rand_num = random.randrange(len(all_words))
 
         phrase += ' '
         phrase += all_words[rand_num]
+
+    return phrase
 
 # Convert speech to text
 def speech_to_text(file_path):
@@ -68,12 +71,21 @@ def check_slurring(file_path, example):
     text = speech_to_text(file_path)
     similar_percent = similarity(text, example)
 
-    print(similar_percent)
+    return 1-similar_percent
 
-    if similar_percent >= 0.7:
-        return 0, similar_percent
-    
-    else:
-        return 1, similar_percent
-    
-toxic, toxicity = check_slurring('hi.wav', 'hello hello hello hello hello hello hello hello')
+def get_wav_file(video_path):
+    try:
+        audio = AudioSegment.from_file(video_path, format='mov')
+        audio.export('test.wav', format='wav')
+    except:
+        audio = AudioSegment.from_file(video_path, format='mp4')
+        audio.export('test.wav', format='wav')
+
+def get_words():
+    with open('phrase.txt', 'r') as file:
+        contents = file.read()
+        x = contents
+    return x
+
+if __name__ =='main':
+    toxic, toxicity = check_slurring('hi.wav', 'hello hello hello hello hello hello hello hello')
