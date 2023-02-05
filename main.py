@@ -1,8 +1,8 @@
 from flask import Flask, render_template, request
 import os
 import face_model
+import cv2
 import voice_model
-
 
 val = None
 val2 = None
@@ -27,26 +27,26 @@ def upload_photo():
 @app.route('/upload_video', methods=['POST'])
 def upload_video():
   video = request.files['video']
-  video.save(os.path.join(os.getcwd(), video.filename))
+  video_filename = os.path.join(os.getcwd(), video.filename)
+  video.save(video_filename)
 
   phrase = voice_model.get_phrase(2)
-
+  print(phrase)
   with open('phrase.txt', 'w') as f:
     f.write(phrase)
 
-  val2 = voice_model.check_slurring(video.filename, phrase)
+  voice_model.get_wav_file(video.filename)
+
+  val2 = voice_model.check_slurring('test.wav', phrase)
 
   if ((val + val2)/2) >= 0.6:
     return render_template('not_intoxicated.html')
   else:
     return render_template('intoxicated.html')
 
+@app.route('/ph')
+def ph():
+  print('hi')
+  return render_template('camera.html')
 
-  '''
-  if val == 0:
-    return render_template('not_intoxicated.html')
-  else:
-    return render_template('intoxicated.html')
-  '''
-
-app.run(host='0.0.0.0', port=81)
+app.run(host='0.0.0.0', port=18)
