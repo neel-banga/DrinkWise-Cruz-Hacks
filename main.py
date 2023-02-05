@@ -29,7 +29,12 @@ def upload_video():
   video = request.files['video']
   video.save(os.path.join(os.getcwd(), video.filename))
 
-  val2 = voice_model.check_slurring(video.filename)
+  phrase = voice_model.get_phrase(2)
+
+  with open('phrase.txt', 'w') as f:
+    f.write(phrase)
+
+  val2 = voice_model.check_slurring(video.filename, phrase)
 
   if ((val + val2)/2) >= 0.6:
     return render_template('not_intoxicated.html')
