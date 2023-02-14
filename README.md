@@ -1,1 +1,1 @@
-# Drinkwise---A-Cruz-Hacks-Project
+# Made For CruzHacks (Hackathon Hosted By UC Santa Cruz)
