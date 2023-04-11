@@ -7,7 +7,7 @@ The inspiration for DrinkWise came from the devastating effects of drunk driving
 
 ##### Features
 
-DrinkWise is a web-app with two tests to detect sobriety
+DrinkWise is a web-app with two tests to detect sobriety:
 
 - First is a face test, we trained this fully from scratch on a dataset of both drunk and sober people
 - Second we analyzed spectrograms & used an algorithm called levenshtein distance to be able to detect whether a user is slurring
