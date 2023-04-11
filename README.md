@@ -1,4 +1,4 @@
-## MADE FOR CRUZ HACKS - 1ST PLACE 
+## MADE FOR CRUZ HACKS - BEST BEGGINER
 
 #### Devpost Submission: https://devpost.com/software/drink-wise
 
