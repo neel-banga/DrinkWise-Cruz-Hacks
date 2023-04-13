@@ -83,5 +83,3 @@ def check():
     output = model(img_batch)
     predicted_class = torch.argmax(output)
     print("Predicted class:", predicted_class.item())
-
-check()
