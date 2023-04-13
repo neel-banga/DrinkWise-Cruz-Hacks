@@ -72,10 +72,10 @@ def train_model():
 
 #train_model()
 
-def check():
+def check_intoxicated(path):
 
     model = Model()
-    model.load_state_dict(torch.load('model.pth'))
+    model.load_state_dict(torch.load(path))
     img = Image.open('IMAGES/sober/piece72.jpg')
     img_transformed = img_transforms(img)
     img_batch = img_transformed.unsqueeze(0)  # Add a batch dimension
