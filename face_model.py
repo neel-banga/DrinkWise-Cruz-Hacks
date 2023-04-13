@@ -1,112 +1,87 @@
-import data
 import torch
+from torchvision import transforms, datasets
 import torch.nn as nn
-import random
-import torchvision.transforms as transforms
-import os
+import torch.optim as optim
 from PIL import Image
+import os
+import os
+import shutil
 
-# Fetch datasets from data.py file
-set_x, set_y = data.get_datasets()
+directory_path = 'pieces'
 
-# Create the model
+even_folder_path = 'sober'
+odd_folder_path = 'drunk'
 
-class Net(nn.Module):
+os.makedirs(even_folder_path, exist_ok=True)
+os.makedirs(odd_folder_path, exist_ok=True)
 
-    def __init__(self, input_size, hidden_size, output_size):
+for filename in os.listdir(directory_path):
+    if filename.endswith('.jpg'):
+        number = int(filename.replace('piece', '').replace('.jpg', ''))
+        
+        if number % 2 == 0:
+            shutil.move(os.path.join(directory_path, filename), os.path.join(even_folder_path, filename))
+        else:
+            shutil.move(os.path.join(directory_path, filename), os.path.join(odd_folder_path, filename))
+
+
+img_transforms = transforms.Compose([
+    transforms.Resize((50, 50)),
+    transforms.Grayscale(),
+    transforms.ToTensor()
+])
+
+training = datasets.ImageFolder('IMAGES', transform=img_transforms)
+train_loader = torch.utils.data.DataLoader(training, batch_size=3, shuffle=True)
+
+class Model(nn.Module):
+    def __init__(self):
+
         super().__init__()
-        self.input = nn.Linear(input_size, hidden_size)
-        self.relu = nn.ReLU()
-        self.fc2 = nn.Linear(hidden_size, hidden_size)
-        self.fc3 = nn.Linear(hidden_size, hidden_size)
-        self.fc4 = nn.Linear(hidden_size, hidden_size)
-        self.fc5 = nn.Linear(hidden_size, hidden_size)
-        self.output = nn.Linear(hidden_size, output_size) 
-        self.softmax = nn.Softmax()
+
+        self.convolution = nn.Sequential(
+            nn.Conv2d(1, 32, (5, 5)),
+            nn.ReLU(),
+            nn.Conv2d(32, 64, (5, 5)),
+            nn.ReLU(),
+            nn.Flatten(),
+            nn.Linear(112896, 2)
+        )
 
     def forward(self, x):
-        x = self.input(x)
-        x = self.relu(x)
-        x = self.fc2(x)
-        x = self.relu(x)
-        x = self.output(x)
-        
-        return torch.sigmoid(x)
-
-random.shuffle(set_x)
-random.shuffle(set_y)
-
-input_size = 451632
-hidden_size =  64
-output_size = 2
-
-EPOCHS = 5
+        return self.convolution(x)
 
 def train_model():
-    model = Net(input_size, hidden_size, output_size)
-    optim = torch.optim.Adam(model.parameters(), lr=0.0001)
-    loss_fn = nn.MSELoss()
+    model = Model()
 
-    model = Net(input_size, hidden_size, output_size)
+    opt = optim.Adam(model.parameters(), lr = 0.0001)
+    loss_fn = nn.CrossEntropyLoss()
 
-    for epoch in range(EPOCHS):
-
-        for i in range(len(set_x)):
-
-            optim.zero_grad()
-
-            outputs = model(set_x[i])
-            target = torch.tensor(set_y[i])
-            loss = loss_fn(outputs, target)
-
+    for epoch in range(20):
+        for batch in train_loader:
+            X, y = batch
+            output = model(X)
+            
+            loss = loss_fn(output, y)
+            opt.zero_grad()
             loss.backward()
-            optim.step()
-            print(loss)
+            opt.step()
 
-    torch.save(model.state_dict(), 'model.pth')
+        print(f'LOSS: {loss}')
+        torch.save(model.state_dict(), 'model.pth')
 
 #train_model()
 
-def to_tensor(file_path):
-    transform = transforms.ToTensor()
-    img = Image.open(os.path.join(os.getcwd(), file_path))
-    tensor = transform(img)
-    flattened_tensor = tensor.flatten()
-    target_size = 451632
-    tensor_size = flattened_tensor.size(0)
-    padding = target_size - tensor_size
-    padded_tensor = torch.nn.functional.pad(flattened_tensor, (0, padding), "constant", 0)
+def check():
 
-    return padded_tensor
+    model = Model()
+    model.load_state_dict(torch.load('model.pth'))
+    img = Image.open('IMAGES/sober/piece72.jpg')
+    img_transformed = img_transforms(img)
+    img_batch = img_transformed.unsqueeze(0)  # Add a batch dimension
 
-def check_intoxicated(file_path):
-    intox = Net(input_size, hidden_size, output_size)
-    intox.load_state_dict(torch.load('model.pth'))
-    intox.eval()
-    with torch.no_grad():
-        output = intox(to_tensor(file_path))
-    
-        output = output.tolist()
-        
-    return 1-output[0]
+    output = model(img_batch)
+    predicted_class = torch.argmax(output)
+    print("Predicted class:", predicted_class.item())
 
-'''
-y = 0
-correct = 0
-incorrect = 0
-for filename in os.listdir(os.path.join(os.getcwd(), 'pieces')):
-    res = check_intoxicated(os.path.join('pieces', filename))
-    
-    if y == 0:
-        y += 1
-    else:
-        y -= 1
-
-    if res == y:
-        correct += 1
-    else:
-        incorrect += 1
-
-total = correct + incorrect
-print(correct/incorrect)
-'''
+check()
